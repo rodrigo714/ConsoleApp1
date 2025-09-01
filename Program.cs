@@ -1,19 +1,17 @@
-﻿using System.Linq;
-
-public class WordFinder
+﻿public class Program
 {
     private readonly string[] _scan;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="WordFinder"/> class using the specified matrix of characters.
+    /// Initializes a new instance of the <see cref="Program"/> class using the specified matrix of characters.
     /// </summary>
     /// <param name="matrix">A collection of strings representing the rows of the character matrix. Each string must have the same length,
     /// and the matrix must contain at least one row and one column.</param>
-    public WordFinder(IEnumerable<string> matrix)
+    public Program(IEnumerable<string> matrix)
     {
         ArgumentNullException.ThrowIfNull(matrix);
 
-        string[] rows = [.. matrix];
+        string[] rows = matrix.ToArray();
         if (rows.Length == 0)
         {
             throw new ArgumentException("Must have rows.");
@@ -51,11 +49,7 @@ public class WordFinder
     {
         ArgumentNullException.ThrowIfNull(wordstream);
 
-        HashSet<string> unique = new(StringComparer.Ordinal);
-        foreach (string? w in wordstream.Where(w => !string.IsNullOrEmpty(w)))
-        {
-            unique.Add(w);
-        }
+        HashSet<string> unique = new(wordstream.Where(w => !string.IsNullOrEmpty(w)), StringComparer.Ordinal);
 
         if (unique.Count == 0) yield break;
 
@@ -97,5 +91,45 @@ public class WordFinder
         }
 
         return count;
+    }
+
+    // Entry point for the application
+    public static void Main()
+    {
+        // Matrix from the example
+        List<string> matrix =
+            [
+                "abcdc",
+                "fgwio",
+                "chill",
+                "pqnsd",
+                "uvdwy"
+            ];
+
+        // Word stream from the example
+        List<string> words = ["cold", "wind", "snow", "chill"];
+
+        Program program = new(matrix);
+        IEnumerable<string> topWords = program.Find(words);
+
+        try
+        {
+            if (!topWords.Any())
+            {
+                Console.WriteLine("No words found in the matrix.");
+            }
+            else
+            {
+                Console.WriteLine("Top words found:");
+                foreach (string word in topWords)
+                {
+                    Console.WriteLine(word);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
     }
 }
